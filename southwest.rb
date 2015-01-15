@@ -51,6 +51,15 @@ end
 
 parser.parse!
 
+#Setip DynamoDB
+dynamo_db = AWS::DynamoDB.new
+table = dynamo_db.tables['sbsw']
+table.hash_key = [:airport_combo, :string]
+table.range_key = [:date, :string]
+
+airport_combo = options[:departingAirport] + "/BHM"
+item = table.items.create('airport_combo' => airport_combo, 'date' => options[:travelDate])
+
 agent = Mechanize.new
 
 # Get the flickr sign in page
@@ -101,5 +110,7 @@ else
         price = price[2]
         flight.setFlightPrice(price)
         puts flightNums[0] + "/" + ": $" + price
+	item.attributes.set 'price' => price
+	item.attributes.set 'flight_num' => combinedNum
     end
 end
