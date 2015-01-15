@@ -66,10 +66,12 @@ results.radiobuttons_with(:name => 'outboundTrip').each_with_index do |entry, in
     text = entry.value
     if text.include? "BHM"
 	flight = FlightInfo.new
-	flightNum1 = text.sub!(/2015.*\d+:\d+,/, "")
-	flightNum1 = flightNum1.split(',')
-	flight.addFlightNum(flightNum1[0])
-	flight.addFlightNum(flightNum1[10])
+	flightNum = text.sub!(/2015.*\d+:\d+,/, "")
+	flightNum = flightNum.split(',')
+	flight.addFlightNum(flightNum[0])
+	unless flightNum[10] == nil
+	    flight.addFlightNum(flightNum[10])
+	end
 	matchingFlights.push(flight)
     end
 end
@@ -80,10 +82,18 @@ else
     puts "Your flight results from " + options[:departingAirport] + " to " + options[:destination]
     matchingFlights.each do |flight|
     	flightNums = flight.getFlightNums()
-        price = results.fields_with(:name => /#{flightNums[0]}\/#{flightNums[1]}OmnitureDataPointsOutbound/)[0].value
+	combinedNum = ""
+	if flightNums.length < 2
+	    combinedNum = flightNums[0]
+	else
+	    combinedNum += flightNums[0]
+	    combinedNum += "/"
+	    combinedNum += flightNums[1]
+        end
+	price = results.fields_with(:name => /#{combinedNum}OmnitureDataPointsOutbound/)[0].value
         price = price.split(':')
         price = price[2]
         flight.setFlightPrice(price)
-        puts flightNums[0] + "/" + flightNums[1] + ": $" + price
+        puts flightNums[0] + "/" + ": $" + price
     end
 end
