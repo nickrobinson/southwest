@@ -1,6 +1,8 @@
 require 'rubygems'
 require 'mechanize'
 require 'optparse'
+require 'json'
+require 'aws-sdk-v1'
 
 class FlightInfo
     def initialize()
@@ -25,7 +27,7 @@ class FlightInfo
     end
 end
 
-options = {:departingAirport => nil, :destinationAirport => nil, :travelDate => nil}
+options = {:departingAirport => nil, :destinationAirport => nil, :destFile => nil, :travelDate => nil}
 
 parser = OptionParser.new do |opts|
     opts.banner = "Usage: southwest.rb [options]"
@@ -36,6 +38,10 @@ parser = OptionParser.new do |opts|
 
     opts.on('--dest n') do |destAirport|
         options[:destination] = destAirport
+    end
+
+    opts.on('--destFile file') do |destFile|
+	options[:destFile] = destFile
     end
 
     opts.on('--date n') do |date|
